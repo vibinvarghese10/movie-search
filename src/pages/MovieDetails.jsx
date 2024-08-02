@@ -8,7 +8,7 @@ import './Movie.css';
 import Header from '../components/Header';
 
 const APIKEY = "6bedebd8";
-const BASE_URL = "http://www.omdbapi.com/";
+const BASE_URL = "https://www.omdbapi.com/";
 
 function MovieDetails() {
   const { id } = useParams();

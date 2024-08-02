@@ -13,7 +13,7 @@ import Carousel from 'react-bootstrap/Carousel';
 import './Home.css';
 
 const APIKEY = "6bedebd8";
-const BASE_URL = "http://www.omdbapi.com/";
+const BASE_URL = "https://www.omdbapi.com/";
 
 function Home() {
   const [searchQuery, setSearchQuery] = useState('');
