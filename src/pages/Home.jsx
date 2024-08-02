@@ -12,44 +12,31 @@ import Pagination from 'react-bootstrap/Pagination';
 import Carousel from 'react-bootstrap/Carousel';
 import './Home.css';
 
-const APIKEY = "47de2b9e8b2462b53975d18185ac40bf";
-const BASE_URL = "https://api.themoviedb.org/3";
-const SEARCH_URL = `${BASE_URL}/search/movie?api_key=${APIKEY}&query=`;
-const TRENDING_URL = `${BASE_URL}/trending/movie/week?api_key=${APIKEY}`;
+const APIKEY = "6bedebd8";
+const BASE_URL = "http://www.omdbapi.com/";
 
 function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [movies, setMovies] = useState([]);
-  const [trendingMovies, setTrendingMovies] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const moviesPerPage = 6;
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchTrendingMovies = async () => {
-      try {
-        const response = await fetch(TRENDING_URL);
-        const data = await response.json();
-        setTrendingMovies(data.results);
-      } catch (error) {
-        console.error("Error fetching trending movies:", error);
-      }
-    };
-
-    fetchTrendingMovies();
-  }, []);
-
   const handleSearch = async () => {
     if (!searchQuery) return;
-
+  
     try {
-      const response = await fetch(`${SEARCH_URL}${searchQuery}&page=${currentPage}`);
+      const response = await fetch(`${BASE_URL}?s=${searchQuery}&apikey=${APIKEY}&page=${currentPage}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
       const data = await response.json();
-      setMovies(data.results);
-      setTotalPages(data.total_pages);
+      setMovies(data.Search || []);
+      setTotalPages(Math.ceil(data.totalResults / moviesPerPage));
     } catch (error) {
-      console.error("Error fetching search results:", error);
+      console.error("Error fetching search results:", error.message);
+      alert(`Error fetching search results: ${error.message}`);
     }
   };
 
@@ -99,29 +86,47 @@ function Home() {
 
         {/* Carousel for Trending Movies */}
         <Carousel className="mb-4 small-carousel">
-          {trendingMovies.map((movie) => (
-            <Carousel.Item key={movie.id}>
-              <img
-                className="d-block w-100"
-                src={`https://image.tmdb.org/t/p/original${movie.backdrop_path}`}
-                alt={movie.title}
-              />
-              <Carousel.Caption className="carousel-caption">
-                <h5>{movie.title}</h5>
-              </Carousel.Caption>
-            </Carousel.Item>
-          ))}
+          <Carousel.Item>
+            <img
+              className="d-block w-100"
+              src="https://i.postimg.cc/Dw30CV6k/b4a1ba87123937-5daeb6af5f27c.jpg"
+              alt="First slide"
+            />
+            <Carousel.Caption className="carousel-caption">
+              <h5>Kaithi</h5>
+            </Carousel.Caption>
+          </Carousel.Item>
+          <Carousel.Item>
+            <img
+              className="d-block w-100"
+              src="https://i.postimg.cc/N0gzkMry/706b9474134343-5c239806af449.jpg"
+              alt="URI"
+            />
+            <Carousel.Caption className="carousel-caption">
+              <h5>Second slide label</h5>
+            </Carousel.Caption>
+          </Carousel.Item>
+          <Carousel.Item>
+            <img
+              className="d-block w-100"
+              src="https://i.postimg.cc/43xmk69X/JM2-INTL-30-Sht-BRIDGE-03-e1575889045252.jpg"
+              alt="Jumanji"
+            />
+            <Carousel.Caption className="carousel-caption">
+              <h5>Jumanji</h5>
+            </Carousel.Caption>
+          </Carousel.Item>
         </Carousel>
 
         {/* Movies Grid */}
         <Row>
           {movies.slice((currentPage - 1) * moviesPerPage, currentPage * moviesPerPage).map(movie => (
-            <Col key={movie.id} sm={12} md={6} lg={4} className="mb-4">
+            <Col key={movie.imdbID} sm={12} md={6} lg={4} className="mb-4">
               <Card className="small-card">
-                <Card.Img variant="top" src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`} alt={movie.title} />
+                <Card.Img variant="top" src={movie.Poster} alt={movie.Title} />
                 <Card.Body>
-                  <Card.Title>{movie.title}</Card.Title>
-                  <Button variant="primary" onClick={() => handleViewDetails(movie.id)}>View Details</Button>
+                  <Card.Title>{movie.Title}</Card.Title>
+                  <Button variant="primary" onClick={() => handleViewDetails(movie.imdbID)}>View Details</Button>
                 </Card.Body>
               </Card>
             </Col>
